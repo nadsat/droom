@@ -2,6 +2,11 @@
 This is a WIP Elixir library for controlling UPnP/DLNA media renderers and Denon HEOS speakers.
 UPnP/DLNA devices are controlled over plain SOAP/HTTP, while Denon HEOS speakers are controlled over the HEOS CLI protocol.
 
+The top-level `Droom` module is the common entry point for protocol-agnostic
+operations: `Droom.discover/1` runs a one-shot SSDP search and
+`Droom.subscribe/1` / `Droom.unsubscribe/1` attach to the discovery and HEOS
+event topics.
+
 ## UPnP/DLNA
 
 Devices are located with SSDP discovery (`Droom.UPnP.discover/1`,
@@ -80,7 +85,7 @@ Droom.HEOS.play(conn, player["pid"])
 
 ```elixir
 {:ok, discovery} = Droom.UPnP.start_discovery()
-Droom.UPnP.subscribe(:discovery)
+Droom.subscribe(:discovery)
 
 receive do
   {:device_found, device} -> IO.inspect(device)
