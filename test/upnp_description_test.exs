@@ -1,7 +1,7 @@
 defmodule Droom.UPnP.DescriptionTest do
   use ExUnit.Case, async: true
 
-  alias Droom.Test.FakeUPnP
+  alias Droom.Test.MockUPnP
   alias Droom.UPnP.{Description, SOAP}
 
   @av "urn:schemas-upnp-org:service:AVTransport:1"
@@ -53,16 +53,16 @@ defmodule Droom.UPnP.DescriptionTest do
   end
 
   test "fetches a description over HTTP" do
-    {:ok, fake} = FakeUPnP.start_link()
+    {:ok, fake} = MockUPnP.start_link()
 
-    assert {:ok, description} = Description.fetch(FakeUPnP.description_url(fake))
+    assert {:ok, description} = Description.fetch(MockUPnP.description_url(fake))
     assert description.friendly_name == "Test Renderer"
     assert description.model_name == "TestModel"
 
     assert description.services[SOAP.service_type(:av)].control_url ==
-             "http://127.0.0.1:#{FakeUPnP.port(fake)}/control/AVTransport"
+             "http://127.0.0.1:#{MockUPnP.port(fake)}/control/AVTransport"
 
     assert description.services[SOAP.service_type(:rendering)].control_url ==
-             "http://127.0.0.1:#{FakeUPnP.port(fake)}/control/RenderingControl"
+             "http://127.0.0.1:#{MockUPnP.port(fake)}/control/RenderingControl"
   end
 end

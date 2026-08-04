@@ -1,4 +1,4 @@
-defmodule Droom.Test.FakeHEOS do
+defmodule Droom.Test.MockHEOS do
   @moduledoc """
   An in-memory fake HEOS speaker for tests.
 

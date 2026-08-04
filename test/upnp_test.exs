@@ -1,12 +1,12 @@
 defmodule Droom.UPnPTest do
   use ExUnit.Case, async: false
 
-  alias Droom.Test.FakeUPnP
+  alias Droom.Test.MockUPnP
   alias Droom.UPnP.{AVTransport, Connection, RenderingControl}
 
   setup do
-    {:ok, fake} = FakeUPnP.start_link()
-    {:ok, conn} = Droom.UPnP.connect(FakeUPnP.description_url(fake))
+    {:ok, fake} = MockUPnP.start_link()
+    {:ok, conn} = Droom.UPnP.connect(MockUPnP.description_url(fake))
     %{fake: fake, conn: conn}
   end
 
@@ -88,8 +88,8 @@ defmodule Droom.UPnPTest do
   end
 
   test "surfaces UPnP errors" do
-    {:ok, fake} = FakeUPnP.start_link(fail: ["SetVolume"])
-    {:ok, conn} = Droom.UPnP.connect(FakeUPnP.description_url(fake))
+    {:ok, fake} = MockUPnP.start_link(fail: ["SetVolume"])
+    {:ok, conn} = Droom.UPnP.connect(MockUPnP.description_url(fake))
 
     assert {:error, {:upnp_error, 701, "Invalid Action"}} = RenderingControl.set_volume(conn, 42)
   end
@@ -101,7 +101,7 @@ defmodule Droom.UPnPTest do
 
   defp posts(fake) do
     fake
-    |> FakeUPnP.requests()
+    |> MockUPnP.requests()
     |> Enum.filter(&(&1.method == "POST"))
   end
 end

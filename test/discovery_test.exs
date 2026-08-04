@@ -2,14 +2,14 @@ defmodule Droom.DiscoveryTest do
   use ExUnit.Case, async: false
 
   alias Droom.{Device, Discovery}
-  alias Droom.Test.FakeResponder
+  alias Droom.Test.MockResponder
 
   test "one-shot discovery finds devices" do
-    {:ok, responder} = FakeResponder.start_link()
+    {:ok, responder} = MockResponder.start_link()
 
     opts = [
       target_ip: {127, 0, 0, 1},
-      target_port: FakeResponder.port(responder),
+      target_port: MockResponder.port(responder),
       source_port: 0,
       timeout: 1_500
     ]

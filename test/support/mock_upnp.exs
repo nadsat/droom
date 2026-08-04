@@ -1,4 +1,4 @@
-defmodule Droom.Test.FakeUPnP do
+defmodule Droom.Test.MockUPnP do
   @moduledoc """
   An in-memory fake UPnP media renderer for tests.
 

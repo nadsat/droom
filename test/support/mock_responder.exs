@@ -1,4 +1,4 @@
-defmodule Droom.Test.FakeResponder do
+defmodule Droom.Test.MockResponder do
   @moduledoc """
   A fake SSDP responder used to test discovery.
 

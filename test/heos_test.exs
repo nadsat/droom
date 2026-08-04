@@ -2,11 +2,11 @@ defmodule Droom.HEOSTest do
   use ExUnit.Case, async: false
 
   alias Droom.HEOS
-  alias Droom.Test.{FakeHEOS, FakeHEOSResponder}
+  alias Droom.Test.{MockHEOS, MockHEOSResponder}
 
   setup do
-    {:ok, fake} = FakeHEOS.start_link()
-    {:ok, conn} = HEOS.connect(FakeHEOS.host(fake), port: FakeHEOS.port(fake))
+    {:ok, fake} = MockHEOS.start_link()
+    {:ok, conn} = HEOS.connect(MockHEOS.host(fake), port: MockHEOS.port(fake))
     %{fake: fake, conn: conn}
   end
 
@@ -76,15 +76,15 @@ defmodule Droom.HEOSTest do
   end
 
   test "surfaces HEOS errors" do
-    {:ok, fake} = FakeHEOS.start_link(fail: ["player/set_volume"])
-    {:ok, conn} = HEOS.connect(FakeHEOS.host(fake), port: FakeHEOS.port(fake))
+    {:ok, fake} = MockHEOS.start_link(fail: ["player/set_volume"])
+    {:ok, conn} = HEOS.connect(MockHEOS.host(fake), port: MockHEOS.port(fake))
 
     assert {:error, {:heos_error, 7, "Command not executed"}} = HEOS.set_volume(conn, 1, 42)
   end
 
   test "waits through a 'command under process' response", %{conn: _conn} do
-    {:ok, fake} = FakeHEOS.start_link(defer: "player/get_play_state")
-    {:ok, conn} = HEOS.connect(FakeHEOS.host(fake), port: FakeHEOS.port(fake))
+    {:ok, fake} = MockHEOS.start_link(defer: "player/get_play_state")
+    {:ok, conn} = HEOS.connect(MockHEOS.host(fake), port: MockHEOS.port(fake))
 
     assert {:ok, %{"pid" => 1, "state" => "play"}} = HEOS.get_play_state(conn, 1)
   end
@@ -99,8 +99,8 @@ defmodule Droom.HEOSTest do
   end
 
   test "reconnects after a dropped connection" do
-    {:ok, fake} = FakeHEOS.start_link(drop_after: "player/get_volume")
-    {:ok, conn} = HEOS.connect(FakeHEOS.host(fake), port: FakeHEOS.port(fake))
+    {:ok, fake} = MockHEOS.start_link(drop_after: "player/get_volume")
+    {:ok, conn} = HEOS.connect(MockHEOS.host(fake), port: MockHEOS.port(fake))
 
     assert {:ok, %{"level" => 30}} = HEOS.get_volume(conn, 1)
     assert :ok = HEOS.reconnect(conn)
@@ -114,11 +114,11 @@ defmodule Droom.HEOSTest do
 
   describe "discover/1" do
     test "searches for the HEOS search target" do
-      {:ok, responder} = FakeHEOSResponder.start_link()
+      {:ok, responder} = MockHEOSResponder.start_link()
 
       opts = [
         target_ip: {127, 0, 0, 1},
-        target_port: FakeHEOSResponder.port(responder),
+        target_port: MockHEOSResponder.port(responder),
         source_port: 0,
         timeout: 1_500
       ]
@@ -128,10 +128,10 @@ defmodule Droom.HEOSTest do
       assert device.host == "192.168.1.10"
       assert device.port == 1255
 
-      assert [request] = FakeHEOSResponder.requests(responder)
+      assert [request] = MockHEOSResponder.requests(responder)
       assert request =~ "ST: urn:schemas-denon-com:device:ACT-Denon:1"
     end
   end
 
-  defp commands(fake), do: FakeHEOS.commands(fake)
+  defp commands(fake), do: MockHEOS.commands(fake)
 end

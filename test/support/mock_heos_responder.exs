@@ -1,4 +1,4 @@
-defmodule Droom.Test.FakeHEOSResponder do
+defmodule Droom.Test.MockHEOSResponder do
   @moduledoc """
   A fake SSDP responder for HEOS discovery tests.
 
