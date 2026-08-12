@@ -38,11 +38,8 @@ Commands available on `Droom.HEOS`:
 Change events are broadcast on the `:heos` topic after
 `register_for_change_events/1`; subscribe with `Droom.HEOS.subscribe/0`.
 
-## Installation
 
-TODO
-
-Key behaviors:
+### Key behaviors:
 
 - One SOAP action per call; the connection holds the AVTransport and
   RenderingControl control URLs extracted from the device description.
