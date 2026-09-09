@@ -89,6 +89,16 @@ defmodule Droom.HEOSTest do
     assert {:ok, %{"pid" => 1, "state" => "play"}} = HEOS.get_play_state(conn, 1)
   end
 
+  test "returns the real data when the deferred ack carries a payload", %{conn: _conn} do
+    {:ok, fake} =
+      MockHEOS.start_link(defer: "browse/get_containers", defer_payload: true)
+
+    {:ok, conn} = HEOS.connect(MockHEOS.host(fake), port: MockHEOS.port(fake))
+
+    assert {:ok, [container | _]} = HEOS.call(conn, "browse/get_containers")
+    assert container["type"] == "station"
+  end
+
   test "broadcasts events after register_for_change_events", %{conn: conn} do
     HEOS.subscribe()
     assert HEOS.register_for_change_events(conn) == :ok

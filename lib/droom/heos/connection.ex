@@ -275,8 +275,8 @@ defmodule Droom.HEOS.Connection do
 
   defp handle_response(state, _msg), do: state
 
-  defp deferred?(%{result: "success", message: "command under process", payload: payload}) do
-    payload in [nil, "", %{}, []]
+  defp deferred?(%{message: message}) when is_binary(message) do
+    String.contains?(String.downcase(message), "command under process")
   end
 
   defp deferred?(_), do: false

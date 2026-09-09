@@ -174,6 +174,20 @@ defmodule Droom.HEOS do
   @spec get_groups(GenServer.server()) :: result()
   def get_groups(conn), do: call(conn, "group/get_groups")
 
+  @doc "Returns music sources."
+  @spec get_music_sources(GenServer.server()) :: result()
+  def get_music_sources(conn), do: call(conn, "browse/get_music_sources")
+
+  @doc "Returns music_source by id."
+  @spec get_music_source(GenServer.server(), Integer.t()) :: result()
+  def get_music_source(conn, service_id),
+    do: call(conn, "browse/browse", %{"sid" => service_id})
+
+  @doc "Returns container info."
+  @spec get_container_info(GenServer.server(), Integer.t(), String.t()) :: result()
+  def get_container_info(conn, service_id, container_id),
+    do: call(conn, "browse/browse", %{"sid" => service_id, "cid" => container_id})
+
   defp start_connection(opts) do
     case Process.whereis(Droom.HEOSSupervisor) do
       nil -> Connection.start_link(opts)

@@ -89,3 +89,10 @@ receive do
   {:device_lost, usn, device} -> IO.inspect({usn, device})
 end
 ```
+
+## Music resources
+```elixir
+{:ok, resources}= Droom.HEOS.get_music_sources(conn)
+[rm |_]=resources |> Enum.filter(fn r -> r["name"]=="Tidal" end)
+Droom.HEOS.get_music_source(conn, rm["sid"])
+```

@@ -35,6 +35,7 @@ defmodule Droom.Test.MockHEOS do
   def init(opts) do
     fail = Keyword.get(opts, :fail, [])
     defer = Keyword.get(opts, :defer)
+    defer_payload = Keyword.get(opts, :defer_payload, false)
     drop_after = Keyword.get(opts, :drop_after)
 
     listen_opts = [:binary, {:packet, :raw}, {:active, false}, {:reuseaddr, true}]
@@ -44,7 +45,12 @@ defmodule Droom.Test.MockHEOS do
       parent = self()
 
       spawn_link(fn ->
-        accept_loop(listen_socket, parent, %{fail: fail, defer: defer, drop_after: drop_after})
+        accept_loop(listen_socket, parent, %{
+          fail: fail,
+          defer: defer,
+          defer_payload: defer_payload,
+          drop_after: drop_after
+        })
       end)
 
       {:ok, %{port: port, commands: []}}
@@ -80,6 +86,12 @@ defmodule Droom.Test.MockHEOS do
         :gen_tcp.send(socket, response(command, opts))
 
         if path == opts.defer do
+          if opts.defer_payload do
+            :gen_tcp.send(socket, deferred(path, []))
+          else
+            :gen_tcp.send(socket, deferred(path))
+          end
+
           :gen_tcp.send(socket, success(path, payload(path, command)))
         end
 
@@ -135,10 +147,12 @@ defmodule Droom.Test.MockHEOS do
         "payload" => payload
       })
 
-  defp deferred(path) do
-    encode(%{
-      "heos" => %{"command" => path, "result" => "success", "message" => "command under process"}
-    })
+  defp deferred(path, payload \\ nil) do
+    body = %{
+      "heos" => %{"command" => path, "result" => "", "message" => "command under process"}
+    }
+
+    encode(if(payload == nil, do: body, else: Map.put(body, "payload", payload)))
   end
 
   defp fail(path) do
@@ -198,6 +212,15 @@ defmodule Droom.Test.MockHEOS do
             "gid" => 101,
             "name" => "Whole House",
             "players" => [%{"pid" => 1}, %{"pid" => 2}]
+          }
+        ]
+
+      "browse/get_containers" ->
+        [
+          %{
+            "name" => "Music",
+            "type" => "station",
+            "containerID" => 1
           }
         ]
 
